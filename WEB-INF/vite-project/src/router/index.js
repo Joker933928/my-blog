@@ -1,7 +1,6 @@
 import { createRouter,createWebHistory } from 'vue-router'
 import Login from '@/components/Login.vue'
-import FindPassword from '@/components/FindPassword.vue'
-import Register from '@/components/Register.vue'
+import Home from '@/components/Home.vue'
 
 const router = createRouter({
     history:createWebHistory(), // 路由器的工作模式
@@ -12,15 +11,10 @@ const router = createRouter({
             component: Login
         },
         {
-            path:'/register',
-            name:'Register',
-            component: Register
-        },
-        {
-            path:'/password',
-            name:'FindPassword',
-            component: FindPassword
-        },
+            path:'/home',
+            name:'Home',
+            component: Home
+        }
     ]
 })
 

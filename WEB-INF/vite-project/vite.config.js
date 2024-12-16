@@ -10,4 +10,16 @@ export default defineConfig({
       '@': resolve(__dirname,'src'), //配置路径别名
     },
   },
+  server: {
+    host: 'localhost',
+    port: 8082,
+    https:false,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8081/',
+        changeOrigin:true,
+        rewrite: path => path.replace(/^\/api/,'') 
+      },
+    }
+  }
 })

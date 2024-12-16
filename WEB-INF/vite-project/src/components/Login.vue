@@ -1,11 +1,15 @@
 <script>
-import { onMounted, ref } from "vue";
+import { getCurrentInstance, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
+ 
 
 export default {
   name: "Login",
   setup() {
+    // 创建路由
     const router = useRouter();
+    // 创建axios
+    const {proxy} = getCurrentInstance();
     // 1 - 登录页 2 - 忘记密码 3 - 注册
     const state = ref(1);
 
@@ -13,8 +17,33 @@ export default {
       console.log(state.value);
     });
 
+    let login_button = () => {
+      console.log('a')
+      router.push('/home')
+    }
+
+    const apiurl = 'http://localhost:8081/api/user/';
+
+    const user = {
+      username: 'admin',
+      password: 123456
+    }
+
+    fetch(apiurl + 'login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(user),
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log(data)
+    })
+
     return {
       state,
+      login_button
     };
   },
 };
@@ -56,18 +85,117 @@ export default {
             <a class="login-router" @click="state = 2">忘记密码</a>
           </div>
         </div>
-        <button class="login-button">
+        <button class="login-button" @click="login_button">
           <span class="login-span">登录</span>
         </button>
         <div class="reg-box">
-          <a href="javascript:;">注册</a>
-          <ul>
+          <span>第三方登录/注册</span>
+          <div class="right-image">
+            <button class="mat-focus-img">
+              <img src="../assets/GitHub.png" alt="" />
+            </button>
+            <button class="mat-focus-img">
+              <img src="../assets/QQ.png" alt="" />
+            </button>
+            <button class="mat-focus-img">
+              <img src="../assets/WeChat.png" alt="" />
+            </button>
+          </div>
+        </div>
+        <div class="login-reg-box">
+          没有账号，
+          <a href="javascript:;" @click="state = 3">注册</a>
+        </div>
+      </div>
+    </div>
+    <!-- 注册页 -->
+    <div class="login-main" v-if="state === 3">
+      <div class="login-title">
+        <h2>注册</h2>
+      </div>
+      <div class="login-bottom">
+        <div class="login-box">
+          <div class="input-wrapper">
+            <span class="input-span">用户名</span>
+            <input
+              type="text"
+              class="login_input"
+              placeholder="请输入用户名"
+              maxlength="20"
+            />
+          </div>
+        </div>
+        <div class="login-box">
+          <div class="input-wrapper">
+            <span class="input-span">昵称</span>
+            <input
+              type="text"
+              class="login_input"
+              placeholder="请输入昵称"
+              maxlength="20"
+            />
+          </div>
+        </div>
+        <div class="login-box">
+          <div class="input-wrapper">
+            <span class="input-span">邮箱</span>
+            <input
+              type="text"
+              class="login_input"
+              placeholder="请输入邮箱"
+              maxlength="20"
+            />
+          </div>
+        </div>
+        <div class="login-box">
+          <div class="input-wrapper">
+            <span class="input-span">密码</span>
+            <input
+              type="password"
+              class="login_input"
+              placeholder="请输入密码"
+              maxlength="20"
+            />
+          </div>
+        </div>
+        <div class="login-box">
+          <div class="input-wrapper">
+            <span class="input-span">确认密码</span>
+            <input
+              type="password"
+              class="login_input"
+              placeholder="请输入确认密码"
+              maxlength="20"
+            />
+          </div>
+        </div>
+        <button class="login-button">
+          <span class="login-span">注册</span>
+        </button>
+      </div>
+      <div class="reg-box">
+          <span>第三方登录/注册</span>
+          <div class="right-image">
+            <button class="mat-focus-img">
+              <img src="../assets/GitHub.png" alt="" />
+            </button>
+            <button class="mat-focus-img">
+              <img src="../assets/QQ.png" alt="" />
+            </button>
+            <button class="mat-focus-img">
+              <img src="../assets/WeChat.png" alt="" />
+            </button>
+          </div>
+          <!-- <ul>
             <li><img src="../assets/GitHub.png" alt="" /></li>
             <li><img src="../assets/QQ.png" alt="" /></li>
             <li><img src="../assets/WeChat.png" alt="" /></li>
-          </ul>
+          </ul> -->
         </div>
-      </div>
+        <div class="login-reg-box">
+          已有账号，
+          <a href="javascript:;" @click="state = 1">登录</a>
+        </div>
     </div>
     <!-- 找回密码页 -->
     <div class="password-main" v-if="state === 2">
@@ -128,8 +256,9 @@ export default {
         <button class="login-button"  >
           <span class="login-span">修改</span>
         </button>
-        <div class="reg-box">
-          <a href="javascript:;" @click="state = 1">返回登录 ←</a>
+        <div class="login-reg-box">
+          已有账号，
+          <a href="javascript:;" @click="state = 1">立刻登录</a>
         </div>
       </div>
     </div>
@@ -265,13 +394,17 @@ button {
 
 .reg-box {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
+  margin-top: 20px;
 }
 
 .reg-box a {
-  font-size: 14px;
-  color: gray;
+  color: #3494fc;
   text-decoration: none;
+}
+
+.login-reg-box{
+  display: flex;
 }
 
 ul,
@@ -283,9 +416,32 @@ li {
   display: flex;
 }
 
+.reg-box li {
+  margin-right: 10px;
+}
+
 .reg-box ul img {
   width: 20px;
   margin-left: 10px;
+  cursor: pointer;
+}
+
+.right-image{
+  display: flex;
+}
+
+.mat-focus-img{
+  width: 40px;
+  height: 40px;
+  margin-left: 18px;
+  border-radius: 50%;
+  border-color:  rgba(0, 0, 0, .12);
+  line-height: 1;
+  background: transparent;
+}
+
+.mat-focus-img img {
+  width: 20px;
   cursor: pointer;
 }
 

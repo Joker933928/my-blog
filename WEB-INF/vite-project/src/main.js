@@ -7,6 +7,9 @@ import App from './App.vue'
 // 引入路由器
 import router from './router'
 
+// 引入axios
+import axios from 'axios'
+
 // 创建一个应用
 const app = createApp(App)
 
