@@ -1,7 +1,7 @@
 <script>
 import { getCurrentInstance, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
- 
+import Verify from '../utils/Verify';
 
 export default {
   name: "Login",
@@ -17,16 +17,20 @@ export default {
       console.log(state.value);
     });
 
-    let login_button = () => {
-      console.log('a')
-      router.push('/home')
-    }
+    const username = ref("")
+    const password = ref("")
 
     const apiurl = 'http://localhost:8081/api/user/';
 
+    const login_button = async () => {
+      if(!username.value || !password.value){
+        alert("用户名和密码不能为空！");
+        return;
+      }
+      
     const user = {
-      username: 'admin',
-      password: 123456
+      username: username.value,
+      password: password.value
     }
 
     fetch(apiurl + 'login', {
@@ -41,11 +45,20 @@ export default {
       console.log(data)
     })
 
+    username.value = "";
+    password.value = "";
+    
+    // router.push('/home')
+  }
+
     return {
       state,
-      login_button
+      login_button,
+      username,
+      password
     };
   },
+
 };
 </script>
 
@@ -65,6 +78,7 @@ export default {
               class="login_input"
               placeholder="请输入用户名"
               maxlength="20"
+              v-model="username"
             />
           </div>
           <div class="mat-form">
@@ -79,6 +93,7 @@ export default {
               class="login_input"
               placeholder="请输入密码"
               maxlength="20"
+              v-model="password"
             />
           </div>
           <div class="mat-form">

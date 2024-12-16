@@ -2,16 +2,22 @@ package com.example.blog.entily.po;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class User {
+@Builder
+public class User implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * 用户ID
@@ -52,15 +58,13 @@ public class User {
      * 创建时间
      */
     @JsonFormat(pattern = "yyyy_MM_dd HH:mm:ss",timezone = "GMT+8")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date createTime;
+    private LocalDateTime createTime;
 
     /**
      * 更新时间
      */
     @JsonFormat(pattern = "yyyy_MM_dd HH:mm:ss",timezone = "GMT+8")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date updateTime;
+    private LocalDateTime updateTime;
 
 
 

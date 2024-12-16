@@ -25,30 +25,24 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private JwtProperties jwtProperties;
-
     @PostMapping("/login")
     public ResponseVO<LoginVo> login(@RequestBody LoginDTO loginDTO) {
         User user = userService.login(loginDTO);
 
         Map<String, Object> claims = new HashMap<>();
         claims.put(JwtClaimsConstant.USER_ID, user.getId());
-//        String token = JwtUtil.createJWT(
-//                jwtProperties.getAdminSecretKey(),
-//                jwtProperties.getAdminTtl(),
-//                claims
-//        );
+
+        String token = JwtUtil.createJWT(loginDTO.getUsername(),0L,claims);
+        System.out.println(token);;
 
         LoginVo loginVo = LoginVo.builder()
                 .id(user.getId())
                 .username(user.getUsername())
                 .nickname(user.getNickname())
-                .token("token")
+                .token(token)
                 .build();
 
         return ResponseVO.success(loginVo);
-
     }
 
 

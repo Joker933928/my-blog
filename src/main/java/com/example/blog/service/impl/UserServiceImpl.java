@@ -37,16 +37,13 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException(MessageConstant.ACCOUNT_NOT_FOUND);
         }
 
-        if(password == user.getPassword()){
-            System.out.println("密码一致");
+        // 密码比对
+        password = DigestUtils.md5DigestAsHex(password.getBytes());
+        System.out.println(password);
+        if(!password.equals(user.getPassword())){
+            System.out.println(password);
+            throw new BusinessException(MessageConstant.PASSWORD_ERROR);
         }
-
-
-//        password = DigestUtils.md5DigestAsHex(password.getBytes());
-//        if(!password.equals(user.getPassword())){
-//            System.out.println(password);
-//            throw new BusinessException(MessageConstant.PASSWORD_ERROR);
-//        }
 
         return user;
     }

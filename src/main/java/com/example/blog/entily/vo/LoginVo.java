@@ -19,9 +19,6 @@ public class LoginVo implements Serializable {
     // 用户名
     private String username;
 
-    // 密码
-    private String password;
-
     // jwt令牌
     private String token;
 
