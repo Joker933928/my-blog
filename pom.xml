@@ -91,7 +91,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
                 <configuration>
-                    <mainClass>com.example.blog.MyBlogApplication</mainClass>
+                    <mainClass>com.blog.MyBlogApplication</mainClass>
                     <skip>true</skip>
                 </configuration>
                 <executions>

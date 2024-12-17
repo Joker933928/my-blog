@@ -1,217 +1,236 @@
-<script>
+<script setup>
 import { getCurrentInstance, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
-import Verify from '../utils/Verify';
+import VerifyUtils from '@/utils/Verify.js'
 
-export default {
-  name: "Login",
-  setup() {
-    // 创建路由
-    const router = useRouter();
-    // 创建axios
-    const {proxy} = getCurrentInstance();
-    // 1 - 登录页 2 - 忘记密码 3 - 注册
-    const state = ref(1);
+// 创建路由
+const router = useRouter();
+// 1 - 登录页 2 - 忘记密码 3 - 注册
+const state = ref(1);
+const username = ref("");
+const password = ref("");
+const nickname = ref("");
+const email = ref("");
+const confirmPasswrod = ref("");
+const apiurl = "http://localhost:8081";
 
-    onMounted(() => {
-      console.log(state.value);
-    });
+// 切换页面时清空输入框内容
+const switchPage = (page) => {
+  state.value = page;
+  console.log(state.value)
 
-    const username = ref("")
-    const password = ref("")
+  username.value = "";
+  password.value = "";
+  nickname.value = "";
+  email.value = "";
+  confirmPasswrod.value = "";
+}
 
-    const apiurl = 'http://localhost:8081/api/user/';
+// 错误信息
+const errorMessage = ref("");
 
-    const login_button = async () => {
-      if(!username.value || !password.value){
-        alert("用户名和密码不能为空！");
-        return;
-      }
-      
-    const user = {
-      username: username.value,
-      password: password.value
-    }
-
-    fetch(apiurl + 'login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(user),
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log(data)
-    })
-
-    username.value = "";
-    password.value = "";
-    
-    // router.push('/home')
+// 登录
+const login = () => {
+  if (!username.value || !password.value) {
+    alert("用户名和密码不能为空！");
+    return;
   }
 
-    return {
-      state,
-      login_button,
-      username,
-      password
-    };
-  },
+  // 提交的数据
+  const user = {
+    username: username.value,
+    password: password.value,
+  };
 
+  // 调用接口
+  fetch(apiurl + "/api/user/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(user),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      // 将返回的 token 存进 本地存储
+      localStorage.setItem("token", data.data.token);
+    });
 };
+
+// 注册
+const rigster = () => {
+  errorMessage.value = ""; // 每次提交前清空错误提示
+
+  if(!username.value || !nickname.value || !email.value){
+    alert("请填写完整信息")
+    return
+  } else if(!password.value || ! confirmPasswrod.value ){
+    alert("密码不能为空")
+  } else if(password.value != confirmPasswrod.value){
+    alert("两次密码不一致")
+  }
+}
+
+// 页面加载完成时执行
+onMounted(() => {
+  // console.log(state.value);
+});
 </script>
 
 <template>
   <div class="main">
     <!-- 登录页 -->
-    <div class="login-main" v-if="state === 1">
-      <div class="login-title">
-        <h2>登录</h2>
+    <form @submit.prevent="login">
+      <div class="login-main" v-if="state === 1">
+        <div class="login-title">
+          <h2>登录</h2>
+        </div>
+        <div class="login-bottom">
+          <div class="login-box">
+            <div class="input-wrapper">
+              <span class="input-span">用户名</span>
+              <input
+                type="text"
+                class="login_input"
+                placeholder="请输入用户名"
+                maxlength="20"
+                v-model="username"
+              />
+            </div>
+            <div class="mat-form">
+              <a class="login-router" @click="switchPage(2)">忘记用户名</a>
+            </div>
+          </div>
+          <div class="login-box">
+            <div class="input-wrapper">
+              <span class="input-span">密码</span>
+              <input
+                type="password"
+                class="login_input"
+                placeholder="请输入密码"
+                maxlength="20"
+                v-model="password"
+              />
+            </div>
+            <div class="mat-form">
+              <a class="login-router" @click="switchPage(2)">忘记密码</a>
+            </div>
+          </div>
+          <button class="login-button" type="submit">
+            <span class="login-span">登录</span>
+          </button>
+          <div class="reg-box">
+            <span>第三方登录/注册</span>
+            <div class="right-image">
+              <button class="mat-focus-img">
+                <img src="@/assets/image/WeChat.png" alt="" />
+              </button>
+              <button class="mat-focus-img">
+                <img src="@/assets/image/QQ.png" alt="" />
+              </button>
+              <button class="mat-focus-img">
+                <img src="@/assets/image/Github.png" alt="" />
+              </button>
+            </div>
+          </div>
+          <div class="login-reg-box">
+            没有账号，
+            <a href="javascript:;" @click="switchPage(3)">注册</a>
+          </div>
+        </div>
       </div>
-      <div class="login-bottom">
-        <div class="login-box">
-          <div class="input-wrapper">
-            <span class="input-span">用户名</span>
-            <input
-              type="text"
-              class="login_input"
-              placeholder="请输入用户名"
-              maxlength="20"
-              v-model="username"
-            />
-          </div>
-          <div class="mat-form">
-            <a class="login-router" @click="state = 2">忘记用户名</a>
-          </div>
+    </form>
+    <!-- 注册页 -->
+    <form @submit.prevent="rigster">
+      <div class="login-main" v-if="state === 3">
+        <div class="login-title">
+          <h2>注册</h2>
         </div>
-        <div class="login-box">
-          <div class="input-wrapper">
-            <span class="input-span">密码</span>
-            <input
-              type="password"
-              class="login_input"
-              placeholder="请输入密码"
-              maxlength="20"
-              v-model="password"
-            />
+        <div class="login-bottom">
+          <div class="login-box">
+            <div class="input-wrapper">
+              <span class="input-span">用户名</span>
+              <input
+                type="text"
+                class="login_input"
+                placeholder="请输入用户名"
+                maxlength="20"
+                v-model="username"
+              />
+            </div>
           </div>
-          <div class="mat-form">
-            <a class="login-router" @click="state = 2">忘记密码</a>
+          <div class="login-box">
+            <div class="input-wrapper">
+              <span class="input-span">昵称</span>
+              <input
+                type="text"
+                class="login_input"
+                placeholder="请输入昵称"
+                maxlength="20"
+                v-model="nickname"
+              />
+            </div>
           </div>
+          <div class="login-box">
+            <div class="input-wrapper">
+              <span class="input-span">邮箱</span>
+              <input
+                type="text"
+                class="login_input"
+                placeholder="请输入邮箱"
+                maxlength="20"
+                v-model="email"
+              />
+            </div>
+          </div>
+          <div class="login-box">
+            <div class="input-wrapper">
+              <span class="input-span">密码</span>
+              <input
+                type="password"
+                class="login_input"
+                placeholder="请输入密码"
+                maxlength="20"
+                v-model="password"
+              />
+            </div>
+          </div>
+          <div class="login-box">
+            <div class="input-wrapper">
+              <span class="input-span">确认密码</span>
+              <input
+                type="password"
+                class="login_input"
+                placeholder="请输入确认密码"
+                maxlength="20"
+                v-model="confirmPasswrod"
+              />
+            </div>
+          </div>
+          <button class="login-button" type="submit">
+            <span class="login-span">注册</span>
+          </button>
         </div>
-        <button class="login-button" @click="login_button">
-          <span class="login-span">登录</span>
-        </button>
         <div class="reg-box">
           <span>第三方登录/注册</span>
           <div class="right-image">
             <button class="mat-focus-img">
-              <img src="../assets/GitHub.png" alt="" />
+              <img src="@/assets/image/WeChat.png" alt="" />
             </button>
             <button class="mat-focus-img">
-              <img src="../assets/QQ.png" alt="" />
+              <img src="@/assets/image/QQ.png" alt="" />
             </button>
             <button class="mat-focus-img">
-              <img src="../assets/WeChat.png" alt="" />
+              <img src="@/assets/image/Github.png" alt="" />
             </button>
           </div>
-        </div>
-        <div class="login-reg-box">
-          没有账号，
-          <a href="javascript:;" @click="state = 3">注册</a>
-        </div>
-      </div>
-    </div>
-    <!-- 注册页 -->
-    <div class="login-main" v-if="state === 3">
-      <div class="login-title">
-        <h2>注册</h2>
-      </div>
-      <div class="login-bottom">
-        <div class="login-box">
-          <div class="input-wrapper">
-            <span class="input-span">用户名</span>
-            <input
-              type="text"
-              class="login_input"
-              placeholder="请输入用户名"
-              maxlength="20"
-            />
-          </div>
-        </div>
-        <div class="login-box">
-          <div class="input-wrapper">
-            <span class="input-span">昵称</span>
-            <input
-              type="text"
-              class="login_input"
-              placeholder="请输入昵称"
-              maxlength="20"
-            />
-          </div>
-        </div>
-        <div class="login-box">
-          <div class="input-wrapper">
-            <span class="input-span">邮箱</span>
-            <input
-              type="text"
-              class="login_input"
-              placeholder="请输入邮箱"
-              maxlength="20"
-            />
-          </div>
-        </div>
-        <div class="login-box">
-          <div class="input-wrapper">
-            <span class="input-span">密码</span>
-            <input
-              type="password"
-              class="login_input"
-              placeholder="请输入密码"
-              maxlength="20"
-            />
-          </div>
-        </div>
-        <div class="login-box">
-          <div class="input-wrapper">
-            <span class="input-span">确认密码</span>
-            <input
-              type="password"
-              class="login_input"
-              placeholder="请输入确认密码"
-              maxlength="20"
-            />
-          </div>
-        </div>
-        <button class="login-button">
-          <span class="login-span">注册</span>
-        </button>
-      </div>
-      <div class="reg-box">
-          <span>第三方登录/注册</span>
-          <div class="right-image">
-            <button class="mat-focus-img">
-              <img src="../assets/GitHub.png" alt="" />
-            </button>
-            <button class="mat-focus-img">
-              <img src="../assets/QQ.png" alt="" />
-            </button>
-            <button class="mat-focus-img">
-              <img src="../assets/WeChat.png" alt="" />
-            </button>
-          </div>
-          <!-- <ul>
-            <li><img src="../assets/GitHub.png" alt="" /></li>
-            <li><img src="../assets/QQ.png" alt="" /></li>
-            <li><img src="../assets/WeChat.png" alt="" /></li>
-          </ul> -->
         </div>
         <div class="login-reg-box">
           已有账号，
-          <a href="javascript:;" @click="state = 1">登录</a>
+          <a href="javascript:;" @click="switchPage(1)">登录</a>
         </div>
-    </div>
+      </div>
+    </form>
     <!-- 找回密码页 -->
     <div class="password-main" v-if="state === 2">
       <div class="password-title">
@@ -268,12 +287,12 @@ export default {
             />
           </div>
         </div>
-        <button class="login-button"  >
+        <button class="login-button">
           <span class="login-span">修改</span>
         </button>
         <div class="login-reg-box">
           已有账号，
-          <a href="javascript:;" @click="state = 1">立刻登录</a>
+          <a href="javascript:;" @click="switchPage(1)">立刻登录</a>
         </div>
       </div>
     </div>
@@ -418,7 +437,7 @@ button {
   text-decoration: none;
 }
 
-.login-reg-box{
+.login-reg-box {
   display: flex;
 }
 
@@ -441,16 +460,16 @@ li {
   cursor: pointer;
 }
 
-.right-image{
+.right-image {
   display: flex;
 }
 
-.mat-focus-img{
+.mat-focus-img {
   width: 40px;
   height: 40px;
   margin-left: 18px;
   border-radius: 50%;
-  border-color:  rgba(0, 0, 0, .12);
+  border-color: rgba(0, 0, 0, 0.12);
   line-height: 1;
   background: transparent;
 }
