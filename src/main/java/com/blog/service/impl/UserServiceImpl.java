@@ -1,9 +1,10 @@
 package com.blog.service.impl;
 
+import com.blog.entily.dto.EmailCodeDto;
+import com.blog.entily.vo.UserVo;
 import com.blog.enums.FailCodeEnum;
 import com.blog.service.UserService;
-import com.blog.constant.MessageConstant;
-import com.blog.entily.dto.LoginDTO;
+import com.blog.entily.dto.LoginDto;
 import com.blog.entily.dto.UserDto;
 import com.blog.entily.po.User;
 import com.blog.exception.BusinessException;
@@ -29,7 +30,7 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     @Override
-    public User login(LoginDTO loginDTO) {
+    public User login(LoginDto loginDTO) {
         String username = loginDTO.getUsername();
         String password = loginDTO.getPassword();
 
@@ -88,15 +89,20 @@ public class UserServiceImpl implements UserService {
     /**
      * 修改密码
      *
-     * @param userDto
+     * @param emailCodeDto
      */
     @Override
-    public void restPWD(UserDto userDto) {
+    public void restPWD(EmailCodeDto emailCodeDto) {
         // 根据邮箱搜索用户
-        String email = userDto.getEmail();
-        String newPassword = userDto.getPassword();
+        String email = emailCodeDto.getEmail();
+        String newPassword = emailCodeDto.getPassword();
+
         if(newPassword == null || newPassword.length() == 0){
-            throw new BusinessException(FailCodeEnum.PASSWORD_FAIL);
+            throw new BusinessException(FailCodeEnum.PASSWORD_NULL);
+        }
+
+        if(email == null || email.length() == 0){
+            throw new BusinessException(FailCodeEnum.EMAIL_NULL);
         }
 
         User user = userMapper.selectByEmail(email);
@@ -108,5 +114,26 @@ public class UserServiceImpl implements UserService {
         String pwd = DigestUtils.md5DigestAsHex(password);
 
         userMapper.updatePassword(pwd,email);
+    }
+
+    /**
+     * @param userId
+     */
+    @Override
+    public UserVo getUser(Long userId) {
+        // 根据用户ID查询该用户
+        User user = userMapper.selectById(userId);
+
+        if(user == null){
+            throw new BusinessException(FailCodeEnum.USERNAME_NOT_EXIST);
+        }
+        System.out.println(user.getId());
+
+        return UserVo.builder()
+                        .userId(user.getId())
+                        .username(user.getUsername())
+                        .nickname(user.getNickname())
+                        .avatar(user.getAvatar())
+                        .build();
     }
 }

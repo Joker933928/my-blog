@@ -1,8 +1,10 @@
 package com.blog.service;
 
-import com.blog.entily.dto.LoginDTO;
+import com.blog.entily.dto.EmailCodeDto;
+import com.blog.entily.dto.LoginDto;
 import com.blog.entily.dto.UserDto;
 import com.blog.entily.po.User;
+import com.blog.entily.vo.UserVo;
 
 public interface UserService {
 
@@ -11,7 +13,7 @@ public interface UserService {
      * @param loginDTO
      * @return
      */
-    User login(LoginDTO loginDTO);
+    User login(LoginDto loginDTO);
 
     /**
      * 注册
@@ -22,7 +24,13 @@ public interface UserService {
 
     /**
      * 修改密码
-     * @param userDto
+     * @param emailCodeDto
      */
-    void restPWD(UserDto userDto);
+    void restPWD(EmailCodeDto emailCodeDto);
+
+    /**
+     *
+     * @param userId
+     */
+    UserVo getUser(Long userId);
 }

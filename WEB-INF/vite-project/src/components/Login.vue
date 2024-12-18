@@ -1,5 +1,5 @@
 <script setup>
-import { getCurrentInstance, onMounted, ref } from "vue";
+import { getCurrentInstance, onMounted, ref,reactive } from "vue";
 import { useRouter } from "vue-router";
 import VerifyUtils from '@/utils/Verify.js'
 
@@ -439,11 +439,6 @@ button {
 
 .login-reg-box {
   display: flex;
-}
-
-ul,
-li {
-  list-style: none;
 }
 
 .reg-box ul {

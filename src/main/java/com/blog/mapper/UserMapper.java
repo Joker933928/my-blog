@@ -19,4 +19,7 @@ public interface UserMapper {
 
     @Update("update user set password = #{password} where email = #{email}")
     void updatePassword(@Param("password") String password,@Param("email") String email);
+
+    @Select("select * from user where id = #{id}")
+    User selectById(Long id);
 }
